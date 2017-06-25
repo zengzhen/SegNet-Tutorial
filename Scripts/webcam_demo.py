@@ -11,7 +11,7 @@ import time
 
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 # Make sure that caffe is on the python path:
-caffe_root = '/SegNet/caffe-segnet/'
+caffe_root = '/home/logan/workspace/caffe-segnet-cudnn5/'
 sys.path.insert(0, caffe_root + 'python')
 import caffe
 
@@ -20,6 +20,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, required=True)
 parser.add_argument('--weights', type=str, required=True)
 parser.add_argument('--colours', type=str, required=True)
+parser.add_argument('--dataset', type=str, required=True)
+parser.add_argument('--start', type=int, required=True)
+parser.add_argument('--end', type=int, required=True)
 args = parser.parse_args()
 
 net = caffe.Net(args.model,
@@ -36,20 +39,28 @@ label_colours = cv2.imread(args.colours).astype(np.uint8)
 cv2.namedWindow("Input")
 cv2.namedWindow("SegNet")
 
-cap = cv2.VideoCapture(0) # Change this to your webcam ID, or file name for your video file
+#cap = cv2.VideoCapture(0) # Change this to your webcam ID, or file name for your video file
 
+datapath = '/home/logan/data/' + args.dataset + '/temp/'
+start_index = args.start
+end_index = args.end
+
+frame_index = start_index
 rval = True
 
-while rval:
+while frame_index <= end_index:
 	start = time.time()
-	rval, frame = cap.read()
+	#rval, frame = cap.read()
+	frame_name = datapath + "seq_color%05d.png" % frame_index
+	frame = cv2.imread(frame_name)
 
         if rval == False:
             break
 
 	end = time.time()
 	print '%30s' % 'Grabbed camera frame in ', str((end - start)*1000), 'ms'
-
+	
+	print 'input_shape[3][2] = %d %d' % (input_shape[3], input_shape[2])
 	start = time.time()
 	frame = cv2.resize(frame, (input_shape[3],input_shape[2]))
 	input_image = frame.transpose((2,0,1))
@@ -78,9 +89,11 @@ while rval:
 	cv2.imshow("Input", frame)
 	cv2.imshow("SegNet", segmentation_rgb)
 	
-	key = cv2.waitKey(1)
+	frame_index += 1
+	
+	key = cv2.waitKey(-1)
 	if key == 27: # exit on ESC
 	    break
-cap.release()
+#cap.release()
 cv2.destroyAllWindows()
 
