@@ -52,7 +52,7 @@ class image_segmenter:
             print(e)
         end = time.time()
         print '%30s' % 'parse request image in ', str((end - start)*1000), 'ms'
-
+        
         start = time.time()
         frame = cv2.resize(frame, (self.input_shape[3],self.input_shape[2]))
         input_image = frame.transpose((2,0,1))
@@ -82,7 +82,10 @@ class image_segmenter:
         print '%30s' % 'Processed results in ', str((end - start)*1000), 'ms\n'
 
         #cv2.imshow("Input", frame)
-        cv2.imshow("SegNet", segmentation_rgb)
+        #cv2.waitKey(-1)
+        #cv2.namedWindow("SegNet")
+        #cv2.imshow("SegNet", segmentation_rgb)
+        #cv2.waitKey(-1)
         
         #segmentation_rgb = (segmentation_rgb*255).astype(np.uint8)
         #cv2.imwrite("example_result.png", segmentation_rgb)
@@ -103,10 +106,10 @@ class image_segmenter:
 if __name__ == "__main__":
     #--model Example_Models/segnet_sun.prototxt --weights Example_Models/segnet_sun.caffemodel --colours Scripts/sun.png --dataset lobby_test1
     args = parser.parse_args()
-
-    #cv2.namedWindow("Input")
-    cv2.namedWindow("SegNet")
     
+    #cv2.namedWindow("Input")
+    #cv2.namedWindow("SegNet")
+
     seg = image_segmenter(args)
     seg.start_server()
 
